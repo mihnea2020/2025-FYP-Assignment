@@ -56,4 +56,17 @@ class ImageDataLoader:
 
     def __iter__(self):
         # fill in with your own code below
+        """Iterates over images, applying transformations if provided."""
+        for file_path in self.file_list:
+            try:
+                img_rgb, img_gray = read_image_file(file_path)
+                
+                if self.transform:
+                    img_rgb = self.transform(img_rgb)
+                    img_gray = self.transform(img_gray)
+                
+                yield img_rgb, img_gray
+            except Exception as e:
+                print(f"Skipping file {file_path} due to error: {e}")
+
         pass
