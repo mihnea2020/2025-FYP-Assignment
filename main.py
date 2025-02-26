@@ -1,25 +1,49 @@
-class Main:
-    #Libraries
-    import cv2
-    import matplotlib.pyplot as plt 
-    import matplotlib.image as mpimg
-    import numpy as np
-    from PIL import Image 
+from os.path import join
 
-    #Import image directly on gray scale
-    image = cv2.imread('img_1441.png', cv2.IMREAD_GRAYSCALE)
-    _, thresholded = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+import matplotlib.pyplot as plt
 
-    kernel = np.ones((3,3), np.uint8)
+from util.img_util import readImageFile, saveImageFile
+from util.inpaint_util import removeHair
 
-    # Apply Morphological Operations
-    closed = cv2.morphologyEx(thresholded, cv2.MORPH_CLOSE, kernel)  # Fills small holes
-    opened = cv2.morphologyEx(closed, cv2.MORPH_OPEN, kernel)  # Removes small noise
+file_path = './data/example.jpg'
+save_dir = './result'
 
-    # Display Results
-    plt.figure(figsize=(10,5))
-    plt.subplot(2,3,1), plt.imshow(image, cmap='gray'), plt.title("Original"), plt.axis("off")
-    plt.subplot(2,3,3), plt.imshow(opened, cmap='gray'), plt.title("Threshold"), plt.axis("off")
-    
+# read an image file
+img_rgb, img_gray = readImageFile(file_path)
 
-    plt.show()
+# apply hair removal
+blackhat, thresh, img_out = removeHair(img_rgb, img_gray, kernel_size=5, threshold=10)
+
+# plot the images
+plt.figure(figsize=(15, 10))
+
+# original image
+plt.subplot(2, 2, 1)
+plt.imshow(img_rgb)
+plt.title("Original Image")
+plt.axis("off")
+
+# blackHat image
+plt.subplot(2, 2, 2)
+plt.imshow(blackhat, cmap="gray")
+plt.title("BlackHat Image")
+plt.axis("off")
+
+# thresholded mask
+plt.subplot(2, 2, 3)
+plt.imshow(thresh, cmap="gray")
+plt.title("Thresholded Mask")
+plt.axis("off")
+
+# inpainted image
+plt.subplot(2, 2, 4)
+plt.imshow(img_out)
+plt.title("Inpainted Image")
+plt.axis("off")
+
+plt.tight_layout()
+plt.show()
+
+# save the output image
+save_file_path = join(save_dir, 'output.jpg')
+saveImageFile(img_out, save_file_path)
