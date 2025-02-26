@@ -40,6 +40,10 @@ class ImageDataLoader:
 
         # get a sorted list of all files in the directory
         # fill in with your own code below
+        self.file_list = sorted(
+            [os.path.join(directory, f) for f in os.listdir(directory) if
+             f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff'))]
+        )
 
         if not self.file_list:
             raise ValueError("No image files found in the directory.")
