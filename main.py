@@ -1,6 +1,4 @@
 import os
-import pandas as pd
-import matplotlib.pyplot as plt
 from os.path import join
 
 from util.img_util import readImageFile, saveImageFile
