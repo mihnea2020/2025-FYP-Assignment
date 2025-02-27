@@ -1,5 +1,5 @@
 import random
-
+import os
 import cv2
 
 
@@ -38,8 +38,7 @@ class ImageDataLoader:
         self.shuffle = shuffle
         self.transform = transform
 
-        # get a sorted list of all files in the directory
-        # fill in with your own code below
+        # get a sorted list of all image files in the directory
         self.file_list = sorted(
             [os.path.join(directory, f) for f in os.listdir(directory) if
              f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff'))]
@@ -52,25 +51,18 @@ class ImageDataLoader:
         if self.shuffle:
             random.shuffle(self.file_list)
 
-        # get the total number of batches
-        self.num_batches = len(self.file_list)
+        # get the total number of files
+        self.num_sample = len(self.file_list)
 
     def __len__(self):
         return self.num_batches
 
     def __iter__(self):
-        # fill in with your own code below
-        """Iterates over images, applying transformations if provided."""
         for file_path in self.file_list:
-            try:
-                img_rgb, img_gray = read_image_file(file_path)
-                
-                if self.transform:
-                    img_rgb = self.transform(img_rgb)
-                    img_gray = self.transform(img_gray)
-                
-                yield img_rgb, img_gray
-            except Exception as e:
-                print(f"Skipping file {file_path} due to error: {e}")
+            img_rgb, img_gray = readImageFile(file_path)
 
-        pass
+            if self.transform:
+                img_rgb = self.transform(img_rgb)
+                img_gray = self.transform(img_gray)
+
+            yield img_rgb, img_gray

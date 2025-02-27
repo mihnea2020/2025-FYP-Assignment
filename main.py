@@ -1,49 +1,39 @@
-from os.path import join
-
+import os
+import pandas as pd
 import matplotlib.pyplot as plt
+from os.path import join
 
 from util.img_util import readImageFile, saveImageFile
 from util.inpaint_util import removeHair
 
-file_path = './data/example.jpg'
+# file paths
+data_dir = './data'
 save_dir = './result'
 
-# read an image file
-img_rgb, img_gray = readImageFile(file_path)
+# get the list of image files
+valid_extensions = ('.png', '.jpg', '.jpeg', '.bmp', '.tiff')
+image_filenames = sorted([f for f in os.listdir(data_dir) if f.lower().endswith(valid_extensions)])
 
-# apply hair removal
-blackhat, thresh, img_out = removeHair(img_rgb, img_gray, kernel_size=5, threshold=10)
+if not image_filenames:
+    print("No image files found in the 'data' directory.")
+    exit()
 
-# plot the images
-plt.figure(figsize=(15, 10))
+print(f"Found {len(image_filenames)} images.")
 
-# original image
-plt.subplot(2, 2, 1)
-plt.imshow(img_rgb)
-plt.title("Original Image")
-plt.axis("off")
+for file_name in image_filenames:
+    file_path = join(data_dir, file_name)
 
-# blackHat image
-plt.subplot(2, 2, 2)
-plt.imshow(blackhat, cmap="gray")
-plt.title("BlackHat Image")
-plt.axis("off")
+    # read the image
+    img_rgb, img_gray = readImageFile(file_path)
 
-# thresholded mask
-plt.subplot(2, 2, 3)
-plt.imshow(thresh, cmap="gray")
-plt.title("Thresholded Mask")
-plt.axis("off")
+    # hair removal
+    blackhat, thresh, img_out = removeHair(img_rgb, img_gray, kernel_size=25, threshold=10)
 
-# inpainted image
-plt.subplot(2, 2, 4)
-plt.imshow(img_out)
-plt.title("Inpainted Image")
-plt.axis("off")
+    # save the output image
+    save_file_path = join(save_dir, f'processed_{file_name}')
+    saveImageFile(img_out, save_file_path)
 
-plt.tight_layout()
-plt.show()
+    print(f"Processed and saved: {save_file_path}")
 
-# save the output image
-save_file_path = join(save_dir, 'output.jpg')
-saveImageFile(img_out, save_file_path)
+print("Processing complete. All images have been saved in the.")
+
